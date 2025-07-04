@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TODO-List</title>
+    <meta name="viewport" content="width=device-width" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <article id="todolist">
+      <header><h1>TODO's</h1></header>
+      <input type="text" name="text" id="new-todo" placeholder="Text" aria-label="Text" /><button onclick="addItem()">Add</button></div>
+      <div id="new-items"></div>
+    </article>
+  </body>
+</html>
+
+<script>
+  function loadItemsFromStorage() {
+    const storedItems = JSON.parse(localStorage.getItem("todos")) || [];
+    storedItems.forEach((item) => addItemToDOM(item));
+  }
+
+  function saveItemsToStorage(items) {
+    localStorage.setItem("todos", JSON.stringify(items));
+  }
+
+  function addItem() {
+    let todoValue = document.getElementById("new-todo").value;
+
+    let id = Date.now().toString(36); 
+    let newObject = {name: todoValue, checked: false, id: id}; 
+
+    addItemToDOM(newObject);
+
+    let items = JSON.parse(localStorage.getItem("todos")) || [];
+    items.push(newObject);
+    saveItemsToStorage(items);
+
+    document.getElementById("new-todo").value = "";
+  }
+
+  // Function to add item to the DOM
+  function addItemToDOM(newObject) {
+    let todoValue = newObject.name; 
+    let newItemDiv = document.createElement("div");
+    newItemDiv.className = "new-item";
+    newItemDiv.id = newObject.id;
+
+    let checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "todo-checkbox";
+    checkbox.onclick = function(){
+      selectOrUnselect(uuid, checkbox.checked); 
+    }
+    checkbox.checked = newObject.checked; 
+    
+    let textDiv = document.createElement("div");
+    textDiv.textContent = todoValue;
+    textDiv.className = "todo-text";
+
+    let deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.onclick = function() {
+      deleteItem(newObject.id);
+    };
+
+    newItemDiv.appendChild(checkbox);
+    newItemDiv.appendChild(textDiv);
+    newItemDiv.appendChild(deleteButton);
+
+    var containerDiv = document.getElementById("new-items");
+    containerDiv.appendChild(newItemDiv);
+  }
+
+  function selectOrUnselect(id, checked){
+    let items = JSON.parse(localStorage.getItem("todos")) || [];
+    items.find(item => item.uuid == uuid).checked = checked
+    saveItemsToStorage(items);
+  }
+
+
+
+  function deleteItem(id) {
+    document
+      .getElementById("new-items")
+      .querySelector("#" + id)
+      .remove();
+
+    let items = JSON.parse(localStorage.getItem("todos")) || [];
+    items = items.filter((item) => item.id !== id);
+    saveItemsToStorage(items);
+  }
+  window.onload = loadItemsFromStorage;
+
+  
+</script>
+
+<style>
+  #new-todo{
+    width: 60%; 
+  }
+  #todolist {
+    width: 80vw;
+    text-align: center;
+    padding: 30px; 
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+background: #3a46b4;
+background: linear-gradient(90deg, rgba(58, 70, 180, 1) 35%, rgba(253, 29, 29, 1) 67%, rgba(252, 176, 69, 1) 100%);
+  }
+
+  .new-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .todo-text {
+    flex: 1; 
+    text-align: left;
+  }
+  
+</style>
